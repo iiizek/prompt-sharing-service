@@ -25,12 +25,24 @@ const Admin = () => {
         fetchPrompts();
     }, [fetchStatistics, fetchUsers, fetchPrompts]);
 
+    const handleDeletePrompt = (promptId) => {
+        deletePrompt(promptId);
+    };
+
     if (isLoading) {
-        return <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2'>Загрузка</div>;
+        return (
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+                Загрузка
+            </div>
+        );
     }
 
     if (error) {
-        return <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2'>Error: {error}</div>;
+        return (
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+                Error: {error}
+            </div>
+        );
     }
 
     return (
@@ -61,18 +73,13 @@ const Admin = () => {
                 </div>
 
                 {activeTab === 'prompts' && (
-                    <ul className="mt-[3rem] mx-[2rem] grid grid-cols-3 gap-[4rem] justify-evenly">
+                    <ul className="mt-[3rem] mx-[4rem] grid grid-cols-3 gap-[4rem] justify-evenly">
                         {prompts.map((prompt) => (
-                            <div
+                            <PromptCard
                                 key={prompt.id}
-                                className="inline-flex flex-col items-center justify-between bg-white rounded-xl gap-[2rem] cursor-pointer">
-                                <PromptCard prompt={prompt} key={prompt.id} />
-                                <button
-                                    className="text-danger hover:underline mb-[1rem]"
-                                    onClick={() => deletePrompt(prompt.id)}>
-                                    Удалить
-                                </button>
-                            </div>
+                                prompt={prompt}
+                                handleDeletePromptAdmin={() => handleDeletePrompt(prompt.id)}
+                            />
                         ))}
                     </ul>
                 )}

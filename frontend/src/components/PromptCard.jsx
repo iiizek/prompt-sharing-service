@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import usePromptStore from '../stores/prompts';
 import useAuthStore from '../stores/auth';
 
-const PromptCard = ({ prompt }) => {
+const PromptCard = ({ prompt, handleDeletePromptAdmin }) => {
 	const user = JSON.stringify(localStorage.getItem('user'));
     const [isOpen, setIsOpen] = React.useState(false);
 
@@ -73,6 +73,13 @@ const PromptCard = ({ prompt }) => {
                     <p className="text-[1.8rem] bg-secondary text-white p-[0.5rem] rounded-lg">
                         {prompt.modelType}
                     </p>
+                    {handleDeletePromptAdmin && (
+                        <button
+                            className="text-danger hover:underline z-10"
+                            onClick={handleDeletePromptAdmin}>
+                            Удалить
+                        </button>
+                    )}
                     <p>
                         👍{' '}
                         <span className={`${rating >= 0 ? 'text-success' : 'text-danger'}`}>

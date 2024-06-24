@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { getStatistics, getUsers, getPrompts, deleteUser, deletePromptById } from '../api/admin';
+import axiosInstance from '../api/axios';
 
 const useAdminStore = create((set, get) => ({
     statistics: null,

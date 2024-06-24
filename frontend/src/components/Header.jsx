@@ -1,9 +1,13 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 const Header = () => {
     const [isAdmin, setIsAdmin] = useState(false);
+
+    const { pathname } = useLocation();
+
     useEffect(() => {
+        
         const user = JSON.parse(localStorage.getItem('user'));
 
         if (user) {
@@ -16,28 +20,39 @@ const Header = () => {
           <h1 className="text-[3rem] uppercase text-title font-bold">🤖 Prompt Sharing Service</h1>
           <nav>
               <ul className="flex items-center justify-center gap-[2.4rem] text-[2.4rem]">
-
                   {isAdmin && (
                       <Link to="/admin">
-                          <li className="cursor-pointer hover:opacity-60">
+                          <li
+                              className={`${
+                                  pathname === '/admin' ? 'text-primary' : ''
+                              } cursor-pointer hover:opacity-60`}>
                               Админ панель
                           </li>
                       </Link>
                   )}
 
                   <Link to="/">
-                      <li className="cursor-pointer text-primary ">
+                      <li
+                          className={`${
+                              pathname === '/' ? 'text-primary' : ''
+                          } cursor-pointer hover:opacity-60`}>
                           Главная
                       </li>
                   </Link>
 
                   <Link to="/profile">
-                      <li className="cursor-pointer hover:opacity-60">
+                      <li
+                          className={`${
+                              pathname === '/profile' ? 'text-primary' : ''
+                          } cursor-pointer hover:opacity-60`}>
                           Профиль
                       </li>
                   </Link>
                   <Link to="/create-prompt">
-                      <li className="cursor-pointer hover:opacity-60">
+                      <li
+                          className={`${
+                              pathname === '/create-prompt' ? 'text-primary' : ''
+                          } cursor-pointer hover:opacity-60`}>
                           Создать Prompt
                       </li>
                   </Link>
