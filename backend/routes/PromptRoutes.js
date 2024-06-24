@@ -167,6 +167,7 @@ router.delete('/prompts/:id', authMiddleware, async (req, res) => {
         await prompt.destroy();
         res.status(204).send();
     } catch (err) {
+        console.error(err);
         res.status(500).json({ error: 'Произошла ошибка при удалении prompt-а' });
     }
 });

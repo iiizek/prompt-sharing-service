@@ -134,9 +134,27 @@ router.delete('/users/:id', authMiddleware, async (req, res) => {
             return res.status(404).json({ error: 'Пользователь не найден' });
         }
 
+        if (user.id === req.user) {
+            return res.status(403).json({ error: 'Нельзя удалить самого себя' });
+        }
+
+        const prompts = await Prompt.findAll({ where: { userId: user.id } });
+        
+        for (const prompt of prompts) {
+            const favorite = await Favorite.findOne({ where: { promptId: prompt.id } });
+            if (favorite) {
+                await favorite.destroy();
+            }
+
+            await prompt.destroy();
+        }
+
+        await user.update({ avatar: null });
+
         await user.destroy();
         res.status(204).send();
     } catch (err) {
+        console.log(err);
         res.status(500).json({ error: 'Произошла ошибка при удалении пользователя' });
     }
 });
