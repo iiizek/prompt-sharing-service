@@ -2,6 +2,11 @@ import { Router } from 'express';
 import Joi from 'joi';
 
 import User from '../models/User.js';
+import Prompt from '../models/Prompt.js';
+import { Tag } from '../models/Tag.js';
+import Comment from '../models/Comment.js';
+import Like from '../models/Like.js';
+import Favorite from '../models/Favorite.js';
 import authMiddleware from '../middleware/authMiddleware.js';
 
 const router = Router();
@@ -54,12 +59,41 @@ router.post('/users', authMiddleware, async (req, res) => {
 // Получить пользователя по ID (только для авторизованных пользователей)
 router.get('/users/:id', authMiddleware, async (req, res) => {
     try {
-        const user = await User.findByPk(req.params.id); //Найти по Personal Key
+        const user = await User.findByPk(req.params.id, {
+            include: [
+                {
+                    model: Prompt,
+                    attributes: [
+                        'id',
+                        'title',
+                        'promptText',
+                        'resultText',
+                        'resultImage',
+                        'modelType',
+                    ],
+                    include: [
+                        {
+                            model: Tag,
+                            attributes: ['id', 'name'],
+                            through: { attributes: [] },
+                        },
+                        { model: User, attributes: ['id', 'username', 'avatar'] },
+                        { model: Like, attributes: ['id', 'type'] },
+                        {
+                            model: Comment,
+                            attributes: ['id', 'content', 'createdAt'],
+                            include: [{ model: User, attributes: ['username'] }],
+                        },
+                    ],
+                },
+            ],
+        }); //Найти по Personal Key
         if (!user) {
             return res.status(404).json({ error: 'Пользователь не найден' });
         }
         res.status(200).json(user);
     } catch (error) {
+        console.error(error);
         res.status(500).json({ error: 'Произошла ошибка при получении пользователя' });
     }
 });

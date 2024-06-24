@@ -2,6 +2,9 @@ import { Router } from 'express';
 import { Op } from 'sequelize';
 import Prompt from '../models/Prompt.js';
 import { Tag } from '../models/Tag.js';
+import User from '../models/User.js';
+import Comment from '../models/Comment.js';
+import Like from '../models/Like.js';
 
 const router = Router();
 
@@ -11,10 +14,9 @@ router.get('/search', async (req, res) => {
     const { query, tags } = req.query;
 
     try {
-
         let prompts;
         if (tags) {
-            const tagList = tags.split(',').map((tag) => tag.trim());
+            const tagList = tags.split(',').map(Number);
             prompts = await Prompt.findAll({
                 where: {
                     [Op.or]: [
@@ -23,10 +25,21 @@ router.get('/search', async (req, res) => {
                         { resultText: { [Op.iLike]: `%${query}%` } },
                     ],
                 },
-                include: {
-                    model: Tag,
-                    where: { name: { [Op.in]: tagList } },
-                },
+                include: [
+                    {
+                        model: Tag,
+                        where: { id: { [Op.in]: tagList } },
+                        attributes: ['id', 'name'],
+                        through: { attributes: [] },
+                    },
+                    { model: User, attributes: ['id', 'username', 'avatar'] },
+                    { model: Like, attributes: ['id', 'type'] },
+                    {
+                        model: Comment,
+                        attributes: ['id', 'content', 'createdAt'],
+                        include: [{ model: User, attributes: ['username'] }],
+                    },
+                ],
             });
         } else {
             prompts = await Prompt.findAll({
@@ -37,6 +50,17 @@ router.get('/search', async (req, res) => {
                         { resultText: { [Op.iLike]: `%${query}%` } },
                     ],
                 },
+
+                include: [
+                    { model: Tag, attributes: ['id', 'name'], through: { attributes: [] } },
+                    { model: User, attributes: ['id', 'username', 'avatar'] },
+                    { model: Like, attributes: ['id', 'type'] },
+                    {
+                        model: Comment,
+                        attributes: ['id', 'content', 'createdAt'],
+                        include: [{ model: User, attributes: ['username'] }],
+                    },
+                ],
             });
         }
 

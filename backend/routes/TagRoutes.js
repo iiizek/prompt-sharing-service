@@ -22,6 +22,20 @@ router.get('/tags', async (req, res) => {
     }
 });
 
+//Получить теги определенного prompt-а
+router.get('/prompts/:promptId/tags', async (req, res) => {
+    try {
+        const prompt = await Prompt.findByPk(req.params.promptId);
+        if (!prompt) {
+            return res.status(404).json({ error: 'Prompt не найден' });
+        }
+        const tags = await prompt.getTags();
+        res.status(200).json(tags);
+    } catch (error) {
+        res.status(500).json({ error: 'Произошла ошибка при получении тегов' });
+    }
+});
+
 // Создать новый тег (только для админов)
 router.post('/tags', authMiddleware, adminMiddleware, async (req, res) => {
     const { error } = tagSchema.validate(req.body);
@@ -40,6 +54,8 @@ router.post('/tags', authMiddleware, adminMiddleware, async (req, res) => {
 
 // Добавить тег к prompt-у (только для авторизованных пользователей)
 router.post('/prompts/:promptId/tags', authMiddleware, async (req, res) => {
+    console.log(req.params.promptId);
+    console.log(req.body);
     const { error } = tagSchema.validate(req.body);
     if (error) {
         return res.status(400).json({ error: error.details[0].message });
@@ -56,6 +72,7 @@ router.post('/prompts/:promptId/tags', authMiddleware, async (req, res) => {
 
         await prompt.addTag(tag);
         res.status(201).json({ message: 'Тег добавлен к prompt-у', tag });
+        console.log(tag);
     } catch (err) {
         res.status(500).json({ error: 'Произошла ошибка при добавлении тега к prompt-у' });
     }
