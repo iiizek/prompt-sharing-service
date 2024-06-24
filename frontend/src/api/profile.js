@@ -30,7 +30,10 @@ export const getFavoritePrompts = async (userId) => {
 		let prompts = [];
 		favorites.forEach( async (favorite) => {
 			const response = await axiosInstance.get(`http://localhost:5000/api/prompts/${favorite.promptId}`);
-			prompts.push(response.data);
+			prompts.push({
+				...response.data,
+				favorite
+			});
 		})
 		return prompts;
     } catch (error) {

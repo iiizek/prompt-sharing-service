@@ -1,132 +1,118 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import useAdminStore from '../stores/admin';
+import PromptCard from '../components/PromptCard';
+import UserCard from '../components/UserCard'; // Создайте компонент UserCard
 
 const Admin = () => {
+    const {
+        statistics,
+        users,
+        prompts,
+        isLoading,
+        error,
+        fetchStatistics,
+        fetchUsers,
+        fetchPrompts,
+        deleteUser,
+        deletePrompt,
+    } = useAdminStore();
+
+    const [activeTab, setActiveTab] = useState('prompts');
+
+    useEffect(() => {
+        fetchStatistics();
+        fetchUsers();
+        fetchPrompts();
+    }, [fetchStatistics, fetchUsers, fetchPrompts]);
+
+    if (isLoading) {
+        return <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2'>Загрузка</div>;
+    }
+
+    if (error) {
+        return <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2'>Error: {error}</div>;
+    }
+
     return (
         <section className="h-screen flex flex-col">
             <div className="flex-1 mt-[8%] bg-dark rounded-t-3xl p-[4rem] custom-shadow overflow-y-auto">
                 <div className="flex justify-center items-center">
-                    <button className="text-[2.4rem] border-solid border-primary bg-primary rounded-l-3xl p-[1rem]">
+                    <button
+                        className={`text-[2.4rem] border-solid border-primary p-[1rem] ${
+                            activeTab === 'prompts' ? 'bg-primary' : ''
+                        }`}
+                        onClick={() => setActiveTab('prompts')}>
                         Prompt-ы
                     </button>
-                    <button className="text-[2.4rem] border-solid border-primary p-[1rem]">
+                    <button
+                        className={`text-[2.4rem] border-solid border-primary p-[1rem] ${
+                            activeTab === 'users' ? 'bg-primary' : ''
+                        }`}
+                        onClick={() => setActiveTab('users')}>
                         Пользователи
                     </button>
-                    <button className="text-[2.4rem] border-solid border-primary rounded-r-3xl p-[1rem]">
+                    <button
+                        className={`text-[2.4rem] border-solid border-primary p-[1rem] ${
+                            activeTab === 'info' ? 'bg-primary' : ''
+                        }`}
+                        onClick={() => setActiveTab('info')}>
                         Информация
                     </button>
                 </div>
-                <ul className="mt-[3rem] mx-[2rem] grid grid-cols-3 gap-[4rem] justify-evenly">
-                    {/* Карточки prompt-ов */}
-                    <li className="p-[1.5rem] inline-flex flex-col bg-white rounded-xl gap-[2rem] cursor-pointer">
-                        <div className="flex items-start justify-between">
-                            <div className="flex gap-[1rem] flex-wrap w-full">
-                                <p className="text-[1.8rem] bg-gray-200 px-[1rem] rounded">#Тег1</p>
-                                <p className="text-[1.8rem] bg-gray-200 px-[1rem] rounded">#Тег2</p>
-                                <p className="text-[1.8rem] bg-gray-200 px-[1rem] rounded">#Тег3</p>
-                            </div>
-                            <div className="flex flex-col justify-center items-end gap-[.5rem]">
-                                <p className=" text-danger hover:underline">Удалить</p>
-                            </div>
-                        </div>
-                        <div className="flex gap-[2rem] justify-start items-center">
-                            <div className="bg-gray-300 rounded-full w-[6.4rem] h-[6.4rem]">
-                                <img src="#" alt="" />
-                            </div>
-                            <h3 className="text-[2.4rem]">Заголовок prompt-а</h3>
-                        </div>
-                        <div className="flex justify-between items-center">
-                            <p className="text-[1.8rem] bg-secondary text-white p-[0.5rem] rounded-lg">
-                                ChatGPT-4o
-                            </p>
-                            <p>
-                                👍 <span className={`${'text-danger'}`}>-1</span> 👎
-                            </p>
-                        </div>
-                    </li>
-                    
-                    <li className="p-[1.5rem] inline-flex flex-col bg-white rounded-xl gap-[2rem] cursor-pointer">
-                        <div className="flex items-start justify-between">
-                            <div className="flex gap-[1rem] flex-wrap w-full">
-                                <p className="text-[1.8rem] bg-gray-200 px-[1rem] rounded">#Тег1</p>
-                                <p className="text-[1.8rem] bg-gray-200 px-[1rem] rounded">#Тег2</p>
-                                <p className="text-[1.8rem] bg-gray-200 px-[1rem] rounded">#Тег3</p>
-                            </div>
-                            <div className="flex flex-col justify-center items-end gap-[.5rem]">
-                                <p className=" text-danger hover:underline">Удалить</p>
-                            </div>
-                        </div>
 
-                        <div className="flex gap-[2rem] justify-start items-center">
-                            <div className="bg-gray-300 rounded-full w-[6.4rem] h-[6.4rem]">
-                                <img src="#" alt="" />
+                {activeTab === 'prompts' && (
+                    <ul className="mt-[3rem] mx-[2rem] grid grid-cols-3 gap-[4rem] justify-evenly">
+                        {prompts.map((prompt) => (
+                            <div
+                                key={prompt.id}
+                                className="inline-flex flex-col items-center justify-between bg-white rounded-xl gap-[2rem] cursor-pointer">
+                                <PromptCard prompt={prompt} key={prompt.id} />
+                                <button
+                                    className="text-danger hover:underline mb-[1rem]"
+                                    onClick={() => deletePrompt(prompt.id)}>
+                                    Удалить
+                                </button>
                             </div>
-                            <h3 className="text-[2.4rem]">Заголовок prompt-а</h3>
-                        </div>
-                        <div className="flex justify-between items-center">
-                            <p className="text-[1.8rem] bg-secondary text-white p-[0.5rem] rounded-lg">
-                                ChatGPT-4o
-                            </p>
-                            <p>
-                                👍 <span className={`${'text-success'}`}>+6</span> 👎
-                            </p>
-                        </div>
-                    </li>
+                        ))}
+                    </ul>
+                )}
 
-                    {/* Карточки пользователей */}
-                    {/* <li className="bg-white rounded-xl p-[2rem] flex flex-col gap-[1rem]">
-                        <div className="flex justify-start items-center gap-[1rem]">
-                            <div className="w-[6.4rem] h-[6.4rem] bg-gray-300 rounded-full">
-                                <img src="" alt="" />
-                            </div>
-                            <div>
-                                <p className="uppercase text-primary">Имя пользователя</p>
-                                <p>example@email.net</p>
-                            </div>
-                        </div>
-                        <div className="flex gap-[1rem]">
-                            <p className="text-primary">Био:</p>
-                            <p>
-                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Ullam nobis
-                                consectetur commodi, quos temporibus neque minima illum asperiores
-                                perferendis doloremque.
-                            </p>
-                        </div>
-                        <div className="flex justify-between items-center">
-                            <p>
-                                <span className="text-primary">Зарегистрирован:</span> {'Дата'}
-                            </p>
-                            <button className="text-danger hover:underline">Удалить</button>
-                        </div>
-                    </li> */}
+                {activeTab === 'users' && (
+                    <ul className="mt-[3rem] mx-[2rem] grid grid-cols-3 gap-[4rem] justify-evenly">
+                        {users.map((user) => (
+                            <UserCard key={user.id} user={user} onDelete={deleteUser} /> // Используем компонент UserCard
+                        ))}
+                    </ul>
+                )}
 
-                    {/*Информация по сервису*/}
-                    {/* <li className="flex flex-col gap-[1rem] text-[3.2rem]">
+                {activeTab === 'info' && (
+                    <ul className="mt-[3rem] mx-[2rem] flex flex-col gap-[1rem] text-[3.2rem]">
                         <li>
                             <p>
                                 <span className="text-primary uppercase">Пользователи: </span>
-                                {99}
+                                {statistics.users}
                             </p>
                         </li>
                         <li>
                             <p>
-                                <span className="text-primary uppercase">Prompt-ы: </span>
-                                {99}
-                            </p>
-                        </li>
-                        <li>
-                            <p>
-                                <span className="text-primary uppercase">Лайки: </span>
-                                {99}
+                                <span className="text-primary uppercase">Промп-ты: </span>
+                                {statistics.prompts}
                             </p>
                         </li>
                         <li>
                             <p>
                                 <span className="text-primary uppercase">Комментарии: </span>
-                                {99}
+                                {statistics.comments}
                             </p>
                         </li>
-                    </li> */}
-                </ul>
+                        <li>
+                            <p>
+                                <span className="text-primary uppercase">Лайки/Дизлайки: </span>
+                                {statistics.likes}
+                            </p>
+                        </li>
+                    </ul>
+                )}
             </div>
         </section>
     );

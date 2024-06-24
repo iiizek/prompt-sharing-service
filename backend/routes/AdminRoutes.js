@@ -9,7 +9,6 @@ import adminMiddleware from '../middleware/adminMiddleware.js';
 const router = Router();
 
 router.use(authMiddleware);
-router.use(adminMiddleware);
 
 // Получить общую статистику
 router.get('/admin/statistics', async (req, res) => {

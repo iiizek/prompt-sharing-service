@@ -9,7 +9,7 @@ const Header = () => {
         if (user) {
             setIsAdmin(user.isAdmin);
         }
-    })
+    }, [])
 
   return (
       <header className="z-10 fixed top-0 w-full bg-white rounded-xl flex gap-[4.8rem] justify-between items-center flex-wrap py-[1rem] px-[3.2rem]">

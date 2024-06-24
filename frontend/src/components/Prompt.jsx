@@ -11,7 +11,7 @@ const Prompt = ({ isOpen, setIsOpen, prompt, rating }) => {
     const [newComment, setNewComment] = React.useState('');
 
     // Получаем isFavorite из хранилища
-    const isFavorite = favorites.some((favorite) => favorite.userId === prompt.userId);
+    const isFavorite = favorites.some((favorite) => user.id === favorite.favorite.userId && prompt.id === favorite.favorite.promptId);
 
     const handleAddToFavorites = () => {
         addFavorite(prompt.id);
@@ -131,7 +131,7 @@ const Prompt = ({ isOpen, setIsOpen, prompt, rating }) => {
                     )}
                     {prompt.Comments.length > 0 &&
                         prompt.Comments.map((comment) => (
-                            <li key={comment.id} className="flex flex-col gap-[.5rem] items-start">
+                            <li key={comment.id} className="flex flex-col gap-[.5rem]">
                                 <p className="text-[1.8rem] text-primary opacity-80 font-semibold">
                                     {comment.User.username}:
                                 </p>

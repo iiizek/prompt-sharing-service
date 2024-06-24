@@ -44,7 +44,6 @@ const PromptCard = ({ prompt }) => {
     return (
         <>
             <li
-                key={prompt.id}
                 className="p-[1.5rem] inline-flex flex-col justify-between bg-white rounded-xl gap-[2rem] cursor-pointer"
                 onClick={handleOpen}>
                 {prompt.Tags.length > 0 && (
